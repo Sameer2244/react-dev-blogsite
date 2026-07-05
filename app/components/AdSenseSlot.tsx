@@ -17,8 +17,7 @@ interface AdSenseSlotProps {
   className?: string;
 }
 
-// Placeholder client ID — swap to your real ca-pub-XXXXXXXXXXXXXXXX
-const ADSENSE_CLIENT = "ca-pub-0000000000000000";
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const IS_PROD = process.env.NODE_ENV === "production";
 
 declare global {
