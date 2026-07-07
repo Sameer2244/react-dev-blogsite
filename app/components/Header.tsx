@@ -20,7 +20,24 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Main nav bar */}
+      {/* ── Adblocker awareness banner ──────────────────────────────── */}
+      <div
+        className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-mono font-semibold"
+        style={{
+          background: "linear-gradient(90deg, rgba(245,158,11,0.12), rgba(251,191,36,0.08), rgba(245,158,11,0.12))",
+          borderBottom: "1px solid rgba(245,158,11,0.2)",
+          color: "rgba(251,191,36,0.85)",
+        }}
+      >
+        <span style={{ fontSize: "13px" }}>🛡️</span>
+        <span>
+          This site is ad-supported — please{" "}
+          <strong style={{ color: "#fbbf24" }}>turn off your adblocker</strong>
+          {" "}to support free web dev content.
+        </span>
+        <span style={{ opacity: 0.5 }}>🙏</span>
+      </div>
+
       <nav
         className="flex items-center justify-between px-4 sm:px-6 h-16"
         style={{
@@ -35,7 +52,7 @@ export default function Header() {
         <Link
           href="/"
           className="flex items-center gap-2.5 shrink-0"
-          aria-label="React Devdas Shorts — Home"
+          aria-label="Dev Shorts Hub — Home"
         >
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center font-mono font-black text-sm shrink-0"
@@ -56,13 +73,13 @@ export default function Header() {
                 backgroundClip: "text",
               }}
             >
-              React Devdas
+              Dev Shorts
             </span>
             <span
               className="font-mono text-xs"
               style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em" }}
             >
-              SHORTS HUB
+              WEB DEV HUB
             </span>
           </div>
         </Link>

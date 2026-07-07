@@ -27,7 +27,7 @@ export async function generateMetadata({
   if (!topic) {
     return {
       title: "Topic Not Found",
-      description: "This React Shorts topic could not be found.",
+      description: "This Dev Shorts topic could not be found.",
     };
   }
 
@@ -35,15 +35,15 @@ export async function generateMetadata({
     title: topic.title,
     description: topic.description,
     keywords: [
-      "React",
+      "web development",
       topic.shortTitle,
       topic.category,
       topic.difficulty,
-      "React tutorial",
-      "Daily React Shorts",
+      "web dev tutorial",
+      "Daily Dev Shorts",
     ],
     openGraph: {
-      title: `${topic.title} | React Devdas Shorts`,
+      title: `${topic.title} | Dev Shorts Hub`,
       description: topic.description,
       type: "article",
     },
@@ -114,7 +114,7 @@ export default async function TopicPage({
               className="font-mono text-xs"
               style={{ color: "rgba(255,255,255,0.18)" }}
             >
-              {topic.badge} · React Devdas Shorts ·{" "}
+              {topic.badge} · Dev Shorts Hub ·{" "}
               <a
                 href="https://instagram.com/react_devdas"
                 target="_blank"

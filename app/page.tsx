@@ -40,7 +40,7 @@ export default function HomePage() {
               className="w-1.5 h-1.5 rounded-full animate-glow-pulse"
               style={{ background: "#38bdf8" }}
             />
-            Daily React Shorts · Companion Hub
+            Daily Dev Shorts · Companion Hub
           </div>
 
           {/* Main heading */}
@@ -48,7 +48,7 @@ export default function HomePage() {
             id="hero-heading"
             className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-none mb-6 animate-fade-up"
           >
-            <span className="gradient-text-hero">React in</span>
+            <span className="gradient-text-hero">Web Dev in</span>
             <br />
             <span className="gradient-text-hero">60 Seconds</span>
           </h1>
@@ -62,7 +62,7 @@ export default function HomePage() {
             }}
           >
             Deep-dive articles for every{" "}
-            <span style={{ color: "#e1e4e8" }}>Daily React Shorts</span>{" "}
+            <span style={{ color: "#e1e4e8" }}>Daily Dev Shorts</span>{" "}
             episode. One concept. One article. Daily.
           </p>
 
@@ -153,12 +153,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Topics Grid ──────────────────────────────────────────── */}
+      {/* ── Topics Grid (grouped by category) ───────────────────── */}
       <section
         className="px-6 pb-20 max-w-7xl mx-auto w-full"
         aria-labelledby="topics-grid-heading"
       >
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <h2
             id="topics-grid-heading"
             className="text-2xl font-black"
@@ -178,94 +178,126 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {topics.map((topic, idx) => {
-            const catColor = CATEGORY_COLORS[topic.category] ?? "#38bdf8";
-            const diffClass = DIFFICULTY_CLASSES[topic.difficulty] ?? "chip-beginner";
-            const delays = [
-              "delay-100", "delay-200", "delay-300",
-              "delay-400", "delay-500", "delay-600",
-            ];
-            const delayClass = delays[idx % 6];
-
+        {/* Group topics by category */}
+        {(["Hooks", "Performance", "Rendering", "Patterns", "Architecture"] as const)
+          .map((cat) => {
+            const catTopics = topics.filter((t) => t.category === cat);
+            if (catTopics.length === 0) return null;
+            const catColor = CATEGORY_COLORS[cat] ?? "#38bdf8";
             return (
-              <Link
-                key={topic.slug}
-                href={`/topics/${topic.slug}`}
-                className={`group block rounded-2xl p-6 animate-fade-up ${delayClass} transition-all duration-200 hover:-translate-y-1`}
-                style={{
-                  background: "rgba(13,17,23,0.75)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  textDecoration: "none",
-                }}
-                id={`topic-card-${topic.slug}`}
-                aria-label={`Read ${topic.title}`}
-              >
-                {/* Top row: category accent + difficulty */}
-                <div className="flex items-center justify-between mb-4">
-                  <span
-                    className="font-mono text-xs font-bold uppercase tracking-widest"
-                    style={{ color: `${catColor}80` }}
-                  >
-                    {topic.category}
-                  </span>
-                  <span className={`badge-pill ${diffClass}`}>
-                    {topic.difficulty}
-                  </span>
-                </div>
-
-                {/* spacer keeps layout consistent */}
-
-                {/* Title */}
-                <h3
-                  className="text-lg font-bold leading-snug mb-3 transition-colors group-hover:text-white"
-                  style={{ color: "#d1d5db" }}
-                >
-                  {topic.shortTitle}
-                </h3>
-
-                {/* Description */}
-                <p
-                  className="text-sm leading-relaxed line-clamp-2 mb-5"
-                  style={{ color: "rgba(255,255,255,0.28)" }}
-                >
-                  {topic.description}
-                </p>
-
-                {/* Accent line + read link */}
-                <div className="flex items-center justify-between">
+              <div key={cat} className="mb-14">
+                {/* Category header */}
+                <div className="flex items-center gap-4 mb-6">
                   <div
-                    className="h-0.5 flex-1 mr-4 rounded-full"
-                    style={{
-                      background: `linear-gradient(90deg, ${topic.accentColor}40, transparent)`,
-                    }}
+                    className="h-px flex-1"
+                    style={{ background: `linear-gradient(90deg, ${catColor}40, transparent)` }}
                   />
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span
-                      className="text-xs font-mono font-bold"
-                      style={{ color: topic.accentColor }}
-                    >
-                      Read
-                    </span>
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke={topic.accentColor}
-                      strokeWidth="2.5"
-                      className="transition-transform group-hover:translate-x-0.5"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                  <span
+                    className="font-mono text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full shrink-0"
+                    style={{
+                      color: catColor,
+                      background: `${catColor}12`,
+                      border: `1px solid ${catColor}30`,
+                    }}
+                  >
+                    {cat}
+                  </span>
+                  <div
+                    className="h-px flex-1"
+                    style={{ background: `linear-gradient(270deg, ${catColor}40, transparent)` }}
+                  />
                 </div>
-              </Link>
+
+                {/* Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {catTopics.map((topic, idx) => {
+                    const diffClass = DIFFICULTY_CLASSES[topic.difficulty] ?? "chip-beginner";
+                    const delays = [
+                      "delay-100", "delay-200", "delay-300",
+                      "delay-400", "delay-500", "delay-600",
+                    ];
+                    const delayClass = delays[idx % 6];
+
+                    return (
+                      <Link
+                        key={topic.slug}
+                        href={`/topics/${topic.slug}`}
+                        className={`group block rounded-2xl p-6 animate-fade-up ${delayClass} transition-all duration-200 hover:-translate-y-1`}
+                        style={{
+                          background: "rgba(13,17,23,0.75)",
+                          border: "1px solid rgba(255,255,255,0.06)",
+                          textDecoration: "none",
+                        }}
+                        id={`topic-card-${topic.slug}`}
+                        aria-label={`Read ${topic.title}`}
+                      >
+                        {/* Top row: difficulty */}
+                        <div className="flex items-center justify-between mb-4">
+                          <span
+                            className="font-mono text-xs font-bold uppercase tracking-widest"
+                            style={{ color: `${catColor}80` }}
+                          >
+                            {topic.badge}
+                          </span>
+                          <span className={`badge-pill ${diffClass}`}>
+                            {topic.difficulty}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3
+                          className="text-lg font-bold leading-snug mb-3 transition-colors group-hover:text-white"
+                          style={{ color: "#d1d5db" }}
+                        >
+                          {topic.shortTitle}
+                        </h3>
+
+                        {/* Description */}
+                        <p
+                          className="text-sm leading-relaxed line-clamp-2 mb-5"
+                          style={{ color: "rgba(255,255,255,0.28)" }}
+                        >
+                          {topic.description}
+                        </p>
+
+                        {/* Accent line + read link */}
+                        <div className="flex items-center justify-between">
+                          <div
+                            className="h-0.5 flex-1 mr-4 rounded-full"
+                            style={{
+                              background: `linear-gradient(90deg, ${topic.accentColor}40, transparent)`,
+                            }}
+                          />
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span
+                              className="text-xs font-mono font-bold"
+                              style={{ color: topic.accentColor }}
+                            >
+                              Read
+                            </span>
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke={topic.accentColor}
+                              strokeWidth="2.5"
+                              className="transition-transform group-hover:translate-x-0.5"
+                            >
+                              <path d="M5 12h14" />
+                              <path d="M12 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
-        </div>
       </section>
+
 
       {/* ── Bottom AdSense Banner ─────────────────────────────────── */}
       <section
@@ -305,7 +337,7 @@ export default function HomePage() {
           >
             @react_devdas
           </a>{" "}
-          · React · Daily
+          · Web Dev · Daily
         </p>
       </footer>
     </main>

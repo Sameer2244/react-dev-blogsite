@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,37 +16,45 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "React Dev Shorts Hub — Daily React Concepts in 60 Seconds",
-    template: "%s | React Devdas Shorts",
+    default: "Dev Shorts Hub — Web Dev Concepts in 60 Seconds",
+    template: "%s | Devdas Shorts",
   },
   description:
-    "Master React one concept at a time. Deep-dive articles for every Daily React Shorts episode — Virtual DOM, useEffect, useState vs useRef, Keys, SSR/SSG, and more.",
+    "Master web development one concept at a time. Deep-dive articles for every Daily Dev Shorts episode — React, JavaScript, CSS, Next.js, performance, rendering patterns, and more.",
   keywords: [
+    "web development",
     "React",
     "React hooks",
+    "JavaScript",
+    "TypeScript",
+    "Next.js",
+    "CSS",
+    "HTML",
+    "frontend development",
+    "web performance",
+    "rendering patterns",
+    "SSR",
+    "SSG",
     "Virtual DOM",
     "useState",
     "useEffect",
-    "useRef",
-    "Next.js",
-    "JavaScript",
-    "React tutorial",
-    "Daily React Shorts",
-    "React Devdas",
+    "web dev tutorial",
+    "Daily Dev Shorts",
+    "Devdas Shorts",
   ],
-  authors: [{ name: "React Devdas", url: "https://instagram.com/react_devdas" }],
+  authors: [{ name: "Devdas", url: "https://instagram.com/react_devdas" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: "React Dev Shorts Hub — Daily React Concepts",
+    title: "Dev Shorts Hub — Web Dev Concepts in 60 Seconds",
     description:
-      "Master React one concept at a time. Deep-dive articles for every Daily React Shorts episode.",
-    siteName: "React Devdas Shorts Hub",
+      "Master web development one concept at a time. Deep-dive articles for every Daily Dev Shorts episode.",
+    siteName: "Dev Shorts Hub",
   },
   twitter: {
     card: "summary_large_image",
-    title: "React Dev Shorts Hub",
-    description: "Deep-dive articles for every Daily React Shorts episode.",
+    title: "Dev Shorts Hub",
+    description: "Deep-dive articles for every Daily Dev Shorts episode.",
   },
 };
 
@@ -86,6 +95,9 @@ export default function RootLayout({
         <div className="relative z-10 flex-1 flex flex-col">
           {children}
         </div>
+
+        {/* Vercel Analytics */}
+        <Analytics />
       </body>
     </html>
   );

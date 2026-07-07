@@ -33,7 +33,7 @@ function SidebarContent({ currentSlug }: { currentSlug?: string }) {
           className="font-mono text-xs font-bold uppercase tracking-widest"
           style={{ color: "rgba(255,255,255,0.25)" }}
         >
-          React Shorts
+          Dev Shorts
         </p>
         <p
           className="font-mono text-xs mt-0.5"
