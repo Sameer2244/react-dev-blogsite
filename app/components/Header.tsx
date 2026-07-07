@@ -19,7 +19,7 @@ export default function Header() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="relative z-50">
       {/* ── Adblocker awareness banner ──────────────────────────────── */}
       <div
         className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-mono font-semibold"
