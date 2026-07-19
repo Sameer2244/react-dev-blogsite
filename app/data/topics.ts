@@ -934,6 +934,1360 @@ export const topics: Topic[] = [
       "react-keys-index-bug",
     ],
   },
+
+
+  {
+    slug: "react-fiber-why-react-got-faster",
+    day: 10,
+    title: "React Fiber — Why React Got Faster & Smoother",
+    shortTitle: "React Fiber",
+    badge: "Day 010",
+    accentColor: EMERALD,
+    difficulty: "Advanced",
+    category: "Rendering",
+    description:
+      "React 16 introduced a secret weapon that made your web applications feel infinitely smoother: React Fiber. But what is it, and why did React need a complete rewrite of its reconciliation engine? Let's break it down.",
+    sections: [
+      {
+        heading: "Old Way  Stack Reconciler",
+        badge: "Old Way  Stack Reconciler",
+        badgeColor: EMERALD,
+        body: "Before Fiber, React updated components synchronously using recursion. Once started, it could not be paused. If your component tree was deep, a rendering update would block the main thread, causing lag and dropped frames.",
+        code: {
+          filename: "StackReconciler.ts",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ❌ Stack Reconciler (React 15 & below)", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "reconcile", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "vnode", color: "#79c0ff" },
+                  { text: ") {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  // 🛑 Synchronous recursion — cannot pause!", color: "#f43f5e", glow: true }
+                ],
+                [
+                  { text: "  ", color: "#e1e4e8" },
+                  { text: "updateElement", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "vnode", color: "#79c0ff" },
+                  { text: ");", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  vnode.", color: "#e1e4e8" },
+                  { text: "children", color: "#79c0ff" },
+                  { text: ".", color: "#e1e4e8" },
+                  { text: "forEach", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "child => reconcile(child)", color: "#ff7b72" },
+                  { text: ");", color: "#e1e4e8" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [{ text: "// Deep trees block the browser main thread!", color: "#8b949e" }],
+              ]
+        },
+      },
+      {
+        heading: "New Way  Fiber Reconciler",
+        badge: "New Way  Fiber Reconciler",
+        badgeColor: EMERALD,
+        body: "React Fiber completely changed this by building a linked list of virtual fiber nodes. Each node represents a unit of work. Because it is a linked list, React can pause traversal, yield to the browser for user interactions, and resume later.",
+        code: {
+          filename: "FiberNode.ts",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Fiber Reconciler (React 16+)", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "interface ", color: "#ff7b72" },
+                  { text: "FiberNode ", color: "#e1e4e8" },
+                  { text: "{", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  child", color: "#79c0ff" },
+                  { text: ": FiberNode | null; ", color: "#8b949e" },
+                  { text: "// First child link", color: "#8b949e" }
+                ],
+                [
+                  { text: "  sibling", color: "#79c0ff" },
+                  { text: ": FiberNode | null; ", color: "#8b949e" },
+                  { text: "// Next sibling link", color: "#8b949e" }
+                ],
+                [
+                  { text: "  return", color: "#79c0ff" },
+                  { text: ": FiberNode | null; ", color: "#8b949e" },
+                  { text: "// Parent link", color: "#8b949e" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [{ text: "// ⚡ A Linked List structure that is interruptible", color: "#7ee787", glow: true }],
+              ]
+        },
+      },
+      {
+        heading: "Reconciler Comparison",
+        badge: "Reconciler Comparison",
+        badgeColor: EMERALD,
+        body: "Stack reconciliation is recursive, synchronous, and blocks the browser thread. Fiber reconciliation is iterative, asynchronous, and completely interruptible. It yields control whenever a frame deadline is close.",
+      },
+      {
+        heading: "Cooperative Scheduling",
+        badge: "Cooperative Scheduling",
+        badgeColor: EMERALD,
+        body: "Under the hood, every fiber node keeps references to its child, its sibling, and its return parent. This structure allows React to step through the tree one node at a time instead of executing a giant, unbreakable call stack.",
+        code: {
+          filename: "WorkLoop.ts",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// Conceptual Fiber work loop", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "while ", color: "#ff7b72" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "nextUnitOfWork ", color: "#79c0ff" },
+                  { text: "&& !", color: "#ff7b72" },
+                  { text: "shouldYield", color: "#d2a8ff" },
+                  { text: "()) {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  nextUnitOfWork = ", color: "#e1e4e8" },
+                  { text: "performUnitOfWork", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    nextUnitOfWork", color: "#79c0ff" }
+                ],
+                [
+                  { text: "  );", color: "#e1e4e8" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [{ text: "// ⏳ shouldYield checks if the 16ms frame limit is near", color: "#7ee787", glow: true }],
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Synchronous updates?", answer: "Blocking Stack", color: ROSE },
+      { question: "Pause & resume work?", answer: "Cooperative Fiber", color: CYAN },
+      { question: "Priority scheduling?", answer: "Scheduler Lanes", color: VIOLET },
+      { question: "Heavy rendering?", answer: "Asynchronous Fiber", color: EMERALD },
+    ],
+    keyTakeaways: [
+      "Stack — Recursion-based, blocking",
+      "Fiber — Linked List-based, asynchronous",
+      "Yielding — Cooperative scheduler frame limits",
+      "Concurrent — Interruptible updates, fluid UI",
+    ],
+    relatedSlugs: [
+      "virtual-dom-vs-real-dom",
+      "react-keys-why-index-as-key-breaks-your-app",
+      "why-you-shouldnt-mutate-state-directly",
+    ],
+  },
+
+  {
+    slug: "custom-hooks-build-one-in-60-seconds",
+    day: 11,
+    title: "Custom Hooks — Build One in 96 Seconds",
+    shortTitle: "Custom Hooks",
+    badge: "Day 011",
+    accentColor: EMERALD,
+    difficulty: "Intermediate",
+    category: "Hooks",
+    description:
+      "Writing the same useState and useEffect logic in every component? That's your cue to build a custom hook. Let's build one from scratch in under ninety-six seconds.",
+    sections: [
+      {
+        heading: "The Problem  Duplication",
+        badge: "The Problem  Duplication",
+        badgeColor: EMERALD,
+        body: "Here's the problem. Sidebar tracks a boolean with useState and toggles it with a handler. Now Modal needs the exact same logic. Copy-pasting this state and handler into every component is exactly what custom hooks exist to prevent.",
+        code: {
+          filename: "DuplicatedLogic.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ❌ Same logic duplicated everywhere", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "Sidebar", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const [isOpen, setIsOpen] = ", color: "#e1e4e8" },
+                  { text: "useState", color: "#d2a8ff" },
+                  { text: "(false);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const toggle = ", color: "#e1e4e8" },
+                  { text: "() => setIsOpen(v => !v);", color: "#79c0ff" },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "Modal", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const [isOpen, setIsOpen] = ", color: "#e1e4e8" },
+                  { text: "useState", color: "#d2a8ff" },
+                  { text: "(false);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  // 🛑 Copy-pasted, identical state logic", color: "#f43f5e", glow: true },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+              ]
+        },
+      },
+      {
+        heading: "The Fix  Custom Hook",
+        badge: "The Fix  Custom Hook",
+        badgeColor: EMERALD,
+        body: "The fix is simple. Move the useState and the toggle function into a regular function whose name starts with use. This function can call other hooks internally, because React tracks hooks by call order, not by which component calls them.",
+        code: {
+          filename: "useToggle.ts",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Extract into a custom hook", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "useToggle", color: "#d2a8ff" },
+                  { text: "(initial = ", color: "#e1e4e8" },
+                  { text: "false", color: "#79c0ff" },
+                  { text: ") {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const [value, setValue] = ", color: "#e1e4e8" },
+                  { text: "useState", color: "#d2a8ff" },
+                  { text: "(initial);", color: "#e1e4e8" },
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "  const toggle = ", color: "#e1e4e8" },
+                  { text: "() => setValue(v => !v);", color: "#79c0ff" },
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "  return ", color: "#ff7b72" },
+                  { text: "[value, toggle];", color: "#e1e4e8" },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+                [{ text: "// ⚡ Just a function that calls other hooks", color: "#7ee787", glow: true }],
+              ]
+        },
+      },
+      {
+        heading: "Before vs After",
+        badge: "Before vs After",
+        badgeColor: EMERALD,
+        body: "Before, every component owns its own duplicated state and handler, with logic scattered everywhere. After, one custom hook owns the logic once, and every component just calls useToggle to reuse it.",
+      },
+      {
+        heading: "Wrong: Wrong vs. Correct Usage",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Using it looks just like any built-in hook. Correct: call useToggle at the top level of your component. Wrong: naming it toggleHook, or calling it inside an if statement. That breaks React's hook order and crashes your app.",
+        code: {
+          filename: "Modal.wrong.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Wrong — breaks the Rules of Hooks", color: "#f43f5e", glow: true }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "Modal", color: "#d2a8ff" },
+                  { text: "({ show }) {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  if ", color: "#ff7b72" },
+                  { text: "(show) {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "    const [isOpen, toggle] = ", color: "#e1e4e8" },
+                  { text: "useToggle", color: "#d2a8ff" },
+                  { text: "();", color: "#e1e4e8" },
+                ],
+                [{ text: "  }", color: "#e1e4e8" }],
+                [{ text: "}", color: "#e1e4e8" }],
+              ]
+        },
+      },
+      {
+        heading: "Correct: Wrong vs. Correct Usage",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Using it looks just like any built-in hook. Correct: call useToggle at the top level of your component. Wrong: naming it toggleHook, or calling it inside an if statement. That breaks React's hook order and crashes your app.",
+        code: {
+          filename: "Modal.correct.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Correct — called at the top level", color: "#7ee787", glow: true }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "Modal", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const [isOpen, toggle] = ", color: "#e1e4e8" },
+                  { text: "useToggle", color: "#d2a8ff" },
+                  { text: "(false);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  return ", color: "#ff7b72" },
+                  { text: "<button onClick={toggle}>Toggle</button>;", color: "#79c0ff" },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Reusing stateful logic?", answer: "Custom Hook", color: EMERALD },
+      { question: "Naming convention?", answer: "use Prefix", color: CYAN },
+      { question: "Calling inside if/loop?", answer: "Not Allowed", color: ROSE },
+      { question: "Sharing markup too?", answer: "Component Instead", color: VIOLET },
+    ],
+    keyTakeaways: [
+      "Extract — Shared stateful logic into one hook",
+      "Prefix — Function name must start with use",
+      "Top-Level — Never call inside loops or conditions",
+      "Reuse — One hook, unlimited components",
+    ],
+    relatedSlugs: [
+      "usestate-vs-useref",
+      "useeffect-cleanup-function",
+      "usememo-vs-usecallback",
+    ],
+  },
+
+  {
+    slug: "context-api-vs-redux-when-you-actually-need-redux",
+    day: 12,
+    title: "Context API vs Redux — When You Actually Need Redux",
+    shortTitle: "Context API vs Redux",
+    badge: "Day 012",
+    accentColor: VIOLET,
+    difficulty: "Intermediate",
+    category: "Architecture",
+    description:
+      "Is your React context slowing down your app? Let's figure out when the built-in Context API is enough, and when you actually need Redux. Let's compare them in under ninety seconds.",
+    sections: [
+      {
+        heading: "Context API  Built-in",
+        badge: "Context API  Built-in",
+        badgeColor: VIOLET,
+        body: "Context API is designed to solve prop drilling, not state management. It lets you pass data directly down the component tree without manually threading props. When the value changes, all consumers re-render, which is fine for low-frequency updates like themes.",
+        code: {
+          filename: "UserProvider.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🌐 Context API: Prop drilling solution", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "UserContext ", color: "#79c0ff" },
+                  { text: "= ", color: "#ff7b72" },
+                  { text: "createContext", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "null", color: "#79c0ff" },
+                  { text: ");", color: "#e1e4e8" },
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "App", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  return (", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "    <", color: "#e1e4e8" },
+                  { text: "UserContext.Provider ", color: "#79c0ff" },
+                  { text: "value", color: "#ff7b72" },
+                  { text: "={user}>", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "      <Dashboard />", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "    </UserContext.Provider>", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  );", color: "#e1e4e8" },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+              ]
+        },
+      },
+      {
+        heading: "Redux Store  Global State",
+        badge: "Redux Store  Global State",
+        badgeColor: VIOLET,
+        body: "Redux is a full state management system. It uses a single global store, actions, and reducers. Crucially, Redux selectors ensure components only re-render if the specific slice of state they select actually changes, avoiding unnecessary re-renders.",
+        code: {
+          filename: "UserProfile.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// ⚡ Redux: State management with selectors", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "Profile", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  // 🎯 Only re-renders if user slice changes", color: "#7ee787", glow: true },
+                ],
+                [
+                  { text: "  const ", color: "#ff7b72" },
+                  { text: "user ", color: "#79c0ff" },
+                  { text: "= ", color: "#ff7b72" },
+                  { text: "useSelector", color: "#d2a8ff" },
+                  { text: "((s) => s.user);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "  const ", color: "#ff7b72" },
+                  { text: "dispatch ", color: "#79c0ff" },
+                  { text: "= ", color: "#ff7b72" },
+                  { text: "useDispatch", color: "#d2a8ff" },
+                  { text: "();", color: "#e1e4e8" },
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "  const ", color: "#ff7b72" },
+                  { text: "update ", color: "#79c0ff" },
+                  { text: "= () => dispatch(editUser(name));", color: "#e1e4e8" },
+                ],
+                [{ text: "}", color: "#e1e4e8" }],
+              ]
+        },
+      },
+      {
+        heading: "Context vs Redux",
+        badge: "Context vs Redux",
+        badgeColor: VIOLET,
+        body: "Let's compare them. Context API is simple, built-in, but triggers full re-renders for all consumers when the context value changes. Redux is complex, requires boilerplate, but gives you fine-grained selector optimization and powerful time-travel debugging.",
+      },
+      {
+        heading: "Wrong: Wrong vs. Correct Pattern",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here is the key mistake: putting high-frequency, complex state like real-time data or form inputs into a single global Context. That causes a re-render storm. For fast, high-frequency updates, Redux is the correct, performant choice.",
+        code: {
+          filename: "ContextStorm.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Wrong: Heavy/frequent state updates in context", color: "#f43f5e", glow: true }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "GlobalStateContext ", color: "#79c0ff" },
+                  { text: "= createContext(null);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "// 🛑 Re-renders the entire application on every keystroke", color: "#8b949e" },
+                ],
+                [
+                  { text: "const [inputVal, setInputVal] = useState('');", color: "#e1e4e8" },
+                ],
+              ]
+        },
+      },
+      {
+        heading: "Correct: Wrong vs. Correct Pattern",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here is the key mistake: putting high-frequency, complex state like real-time data or form inputs into a single global Context. That causes a re-render storm. For fast, high-frequency updates, Redux is the correct, performant choice.",
+        code: {
+          filename: "ReduxSlices.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Correct: Redux selectors limit re-renders", color: "#7ee787", glow: true }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "inputVal ", color: "#79c0ff" },
+                  { text: "= useSelector(s => s.form.input);", color: "#e1e4e8" },
+                ],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "dispatch ", color: "#79c0ff" },
+                  { text: "= useDispatch();", color: "#e1e4e8" },
+                ],
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Low-frequency data (Theme/Auth)?", answer: "Context API", color: CYAN },
+      { question: "High-frequency updates (Forms/Data)?", answer: "Redux Store", color: VIOLET },
+      { question: "Need Middleware or DevTools?", answer: "Redux Store", color: VIOLET },
+      { question: "Simple app, minor state?", answer: "Context API", color: CYAN },
+    ],
+    keyTakeaways: [
+      "Context API — For low-freq updates (Theme/Auth)",
+      "Redux Store — For high-freq or complex states",
+      "Selectors — Redux selectors limit consumer re-renders",
+      "DevTools — Redux provides time-travel debugging",
+    ],
+    relatedSlugs: [
+      "usestate-vs-useref",
+      "custom-hooks-build-one-in-60-seconds",
+      "react-fiber-why-react-got-faster",
+    ],
+  },
+
+  {
+    slug: "error-boundaries-catch-crashes-gracefully",
+    day: 13,
+    title: "Error Boundaries — Catch Crashes Gracefully",
+    shortTitle: "Error Boundaries",
+    badge: "Day 013",
+    accentColor: VIOLET,
+    difficulty: "Intermediate",
+    category: "Architecture",
+    description:
+      "What happens when a React component crashes in production? The entire page goes blank. Let's learn how to catch React crashes gracefully using Error Boundaries in under ninety seconds.",
+    sections: [
+      {
+        heading: "Defining The Boundary",
+        badge: "Defining The Boundary",
+        badgeColor: VIOLET,
+        body: "An Error Boundary is a class component that implements componentDidCatch or getDerivedStateFromError. It acts like a try catch block for components, intercepting errors during rendering, lifecycles, or child constructors.",
+        code: {
+          filename: "ErrorBoundary.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🛡️ Class Component: Error Boundary", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "class ", color: "#ff7b72" },
+                  { text: "ErrorBoundary ", color: "#79c0ff" },
+                  { text: "extends ", color: "#ff7b72" },
+                  { text: "React.Component ", color: "#d2a8ff" },
+                  { text: "{", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  state = { ", color: "#e1e4e8" },
+                  { text: "hasError: ", color: "#79c0ff" },
+                  { text: "false ", color: "#ff7b72" },
+                  { text: "};", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "  static ", color: "#ff7b72" },
+                  { text: "getDerivedStateFromError", color: "#d2a8ff", glow: true },
+                  { text: "() {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    // 🎯 Next render shows fallback UI", color: "#8b949e" }
+                ],
+                [
+                  { text: "    return { ", color: "#e1e4e8" },
+                  { text: "hasError: ", color: "#79c0ff" },
+                  { text: "true ", color: "#ff7b72" },
+                  { text: "};", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  }", color: "#e1e4e8" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Fallback UI Render",
+        badge: "Fallback UI Render",
+        badgeColor: VIOLET,
+        body: "When a crash is caught, the error boundary updates state and renders a fallback UI, like a friendly error card, instead of letting the entire page crash. This isolates the error so the rest of the application remains functional.",
+        code: {
+          filename: "ErrorBoundary.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// ⚙️ Fallback UI Rendering logic", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "render() {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  if (", color: "#ff7b72" },
+                  { text: "this.state.hasError", color: "#79c0ff" },
+                  { text: ") {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    // 🎨 Render fallback UI instead of crashing", color: "#7ee787", glow: true }
+                ],
+                [
+                  { text: "    return <", color: "#e1e4e8" },
+                  { text: "ErrorCard ", color: "#79c0ff" },
+                  { text: "/>;", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  }", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return ", color: "#ff7b72" },
+                  { text: "this.props.children;", color: "#79c0ff" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Crash Behavior comparison",
+        badge: "Crash Behavior comparison",
+        badgeColor: VIOLET,
+        body: "Let's compare them. Standard React crashes unmount the whole tree, showing a blank screen to users. Error boundaries catch errors, display fallback UI, and can even log crashes to services like Sentry, keeping the app alive.",
+      },
+      {
+        heading: "Wrong: Boundary Limits",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here is the key mistake: trying to catch asynchronous errors in event handlers or fetch calls with error boundaries. They only catch rendering errors. Use normal try-catch blocks for async actions and event handlers.",
+        code: {
+          filename: "BrokenAsync.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Wrong: Expecting boundary to catch async crashes", color: "#f43f5e", glow: true }],
+                [
+                  { text: "useEffect(() => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  // 🛑 Boundary CANNOT catch async event crashes!", color: "#8b949e" }
+                ],
+                [
+                  { text: "  fetch('/api').then(() => { throw new Error(); });", color: "#e1e4e8" }
+                ],
+                [{ text: "}, []);", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Correct: Boundary Limits",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here is the key mistake: trying to catch asynchronous errors in event handlers or fetch calls with error boundaries. They only catch rendering errors. Use normal try-catch blocks for async actions and event handlers.",
+        code: {
+          filename: "SafeAsync.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Correct: Handle async errors with local try-catch", color: "#7ee787", glow: true }],
+                [
+                  { text: "try {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  await fetch('/api');", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "} catch (err) {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  setError(err); // 🎯 Update UI state locally", color: "#8b949e" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }]
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "React rendering crash?", answer: "Error Boundary", color: CYAN },
+      { question: "Async fetch or API errors?", answer: "Try / Catch", color: VIOLET },
+      { question: "Button / Event click crash?", answer: "Try / Catch", color: VIOLET },
+      { question: "Third-party widget isolation?", answer: "Error Boundary", color: CYAN },
+    ],
+    keyTakeaways: [
+      "Fallback UI — Show friendly state instead of blank screen",
+      "Isolate Crashes — Prevent a single widget crash from taking down app",
+      "Render Only — Boundaries only catch rendering errors",
+      "Async Catch — Use try-catch blocks for API/events",
+    ],
+    relatedSlugs: [
+      "react-fiber-why-react-got-faster",
+      "lazy-loading-suspense-in-react",
+      "synthetic-events-in-react-explained",
+    ],
+  },
+
+  {
+    slug: "lazy-loading-suspense-in-react",
+    day: 14,
+    title: "React Lazy Loading & Suspense — Load on Demand",
+    shortTitle: "Lazy Loading & Suspense",
+    badge: "Day 014",
+    accentColor: VIOLET,
+    difficulty: "Intermediate",
+    category: "Performance",
+    description:
+      "Why does your app take forever to load on a slow connection? Because you're shipping the entire app in one giant bundle. Let's fix that with React Lazy and Suspense in under ninety seconds.",
+    sections: [
+      {
+        heading: "Splitting The Bundle",
+        badge: "Splitting The Bundle",
+        badgeColor: VIOLET,
+        body: "React lazy takes a function that calls a dynamic import, and returns a regular component. Instead of bundling everything upfront, its code is fetched only when it's actually needed, splitting your JavaScript into smaller chunks.",
+        code: {
+          filename: "Dashboard.lazy.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 📦 Lazy load a heavy component", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "Dashboard ", color: "#79c0ff" },
+                  { text: "= ", color: "#e1e4e8" },
+                  { text: "React.lazy", color: "#d2a8ff", glow: true },
+                  { text: "(() => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return ", color: "#ff7b72" },
+                  { text: "import", color: "#d2a8ff" },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "'./Dashboard'", color: "#a5d6ff" },
+                  { text: ");", color: "#e1e4e8" }
+                ],
+                [{ text: "});", color: "#e1e4e8" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "// 🎯 Chunk downloads only when Dashboard renders", color: "#7ee787", glow: true }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Suspense Boundary",
+        badge: "Suspense Boundary",
+        badgeColor: VIOLET,
+        body: "But lazy components load asynchronously, so React needs something to show while waiting. Wrap them in a Suspense boundary with a fallback prop, like a spinner or skeleton screen, shown until the chunk finishes downloading.",
+        code: {
+          filename: "App.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// ⏳ Show a fallback while the chunk loads", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "<", color: "#e1e4e8" },
+                  { text: "Suspense ", color: "#79c0ff" },
+                  { text: "fallback", color: "#ff7b72" },
+                  { text: "={<", color: "#e1e4e8" },
+                  { text: "Spinner ", color: "#79c0ff" },
+                  { text: "/>}>", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  <", color: "#e1e4e8" },
+                  { text: "Dashboard ", color: "#79c0ff", glow: true },
+                  { text: "/>", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "</", color: "#e1e4e8" },
+                  { text: "Suspense", color: "#79c0ff" },
+                  { text: ">", color: "#e1e4e8" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Bundle Loading Comparison",
+        badge: "Bundle Loading Comparison",
+        badgeColor: VIOLET,
+        body: "Let's compare them. A single bundle forces users to download every route and feature before anything renders. Code splitting with lazy and Suspense loads only what's visible first, streaming the rest in as users navigate.",
+      },
+      {
+        heading: "Wrong: The Common Mistake",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here's the common mistake. Rendering a lazy component without a surrounding Suspense boundary throws an error and crashes your app. Always wrap every lazy import in Suspense, even if the fallback is just a simple spinner.",
+        code: {
+          filename: "Broken.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Wrong: no Suspense wrapper around lazy import", color: "#f43f5e", glow: true }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "Modal ", color: "#79c0ff" },
+                  { text: "= ", color: "#e1e4e8" },
+                  { text: "React.lazy", color: "#d2a8ff" },
+                  { text: "(() => ", color: "#e1e4e8" },
+                  { text: "import", color: "#d2a8ff" },
+                  { text: "('./Modal'));", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "App", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return <", color: "#e1e4e8" },
+                  { text: "Modal ", color: "#79c0ff" },
+                  { text: "/>; ", color: "#e1e4e8" },
+                  { text: "// 🛑 Throws & crashes", color: "#8b949e" }
+                ],
+                [{ text: "}", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Correct: The Common Mistake",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here's the common mistake. Rendering a lazy component without a surrounding Suspense boundary throws an error and crashes your app. Always wrap every lazy import in Suspense, even if the fallback is just a simple spinner.",
+        code: {
+          filename: "Fixed.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Correct: always wrap lazy in Suspense", color: "#7ee787", glow: true }],
+                [
+                  { text: "function ", color: "#ff7b72" },
+                  { text: "App", color: "#d2a8ff" },
+                  { text: "() {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return (", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    <", color: "#e1e4e8" },
+                  { text: "Suspense ", color: "#79c0ff" },
+                  { text: "fallback", color: "#ff7b72" },
+                  { text: "={<", color: "#e1e4e8" },
+                  { text: "Spinner ", color: "#79c0ff" },
+                  { text: "/>}>", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "      <", color: "#e1e4e8" },
+                  { text: "Modal ", color: "#79c0ff" },
+                  { text: "/>", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    </", color: "#e1e4e8" },
+                  { text: "Suspense", color: "#79c0ff" },
+                  { text: ">", color: "#e1e4e8" }
+                ],
+                [{ text: "  );", color: "#e1e4e8" }],
+                [{ text: "}", color: "#e1e4e8" }]
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Heavy route or page?", answer: "Lazy Load", color: CYAN },
+      { question: "Rarely used modal/chart?", answer: "Lazy Load", color: CYAN },
+      { question: "Small above-fold widget?", answer: "Load Eagerly", color: VIOLET },
+      { question: "Needed on first paint?", answer: "Load Eagerly", color: VIOLET },
+    ],
+    keyTakeaways: [
+      "Suspense Required — Always wrap lazy components in a boundary",
+      "Fallback UI — Show a spinner while chunks download",
+      "Fast First Paint — Users see content sooner on slow networks",
+    ],
+    relatedSlugs: [
+      "ssr-ssg-isr-csr-differences",
+      "react-fiber-why-react-got-faster",
+      "error-boundaries-catch-crashes-gracefully",
+    ],
+  },
+
+  {
+    slug: "why-you-shouldnt-mutate-state-directly",
+    day: 15,
+    title: "Why You Shouldn't Mutate State Directly",
+    shortTitle: "Mutating State",
+    badge: "Day 015",
+    accentColor: VIOLET,
+    difficulty: "Beginner",
+    category: "Rendering",
+    description:
+      "Why does your React component refuse to re-render when you update an array or object? The culprit is direct state mutation. Let's learn why you should never mutate React state directly, in under ninety seconds.",
+    sections: [
+      {
+        heading: "Reference Equality",
+        badge: "Reference Equality",
+        badgeColor: VIOLET,
+        body: "React uses reference equality checks to see if state has changed. When you mutate an object directly, its memory address remains exactly the same. React thinks nothing changed, so it skips the re-render.",
+        code: {
+          filename: "ReferenceCheck.ts",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🧠 React's Reference Check (Object.is)", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "oldState ", color: "#79c0ff" },
+                  { text: "= { ", color: "#e1e4e8" },
+                  { text: "count: ", color: "#79c0ff" },
+                  { text: "1 ", color: "#ff7b72" },
+                  { text: "};", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [{ text: "// 🛑 Mutation: Modifies data but same reference", color: "#f43f5e" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "newState ", color: "#79c0ff" },
+                  { text: "= oldState;", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "newState", color: "#e1e4e8" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "count ", color: "#79c0ff" },
+                  { text: "= ", color: "#ff7b72" },
+                  { text: "2;", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "Object", color: "#79c0ff" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "is", color: "#d2a8ff", glow: true },
+                  { text: "(oldState, newState); // 🛑 TRUE (No Render)", color: "#f43f5e" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Solving with Immutability",
+        badge: "Solving with Immutability",
+        badgeColor: VIOLET,
+        body: "The solution is immutability. Always create a new object or array by copying the old one using the spread operator or modern methods. This changes the reference, forcing React to trigger a render.",
+        code: {
+          filename: "ImmutableCheck.ts",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// ✨ Immutability: Create new reference", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "oldState ", color: "#79c0ff" },
+                  { text: "= { ", color: "#e1e4e8" },
+                  { text: "count: ", color: "#79c0ff" },
+                  { text: "1 ", color: "#ff7b72" },
+                  { text: "};", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [{ text: "// 🎯 Spread operator creates a brand new object", color: "#7ee787", glow: true }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "newState ", color: "#79c0ff" },
+                  { text: "= { ", color: "#e1e4e8" },
+                  { text: "...oldState", color: "#ff7b72" },
+                  { text: ", count: ", color: "#79c0ff" },
+                  { text: "2 ", color: "#ff7b72" },
+                  { text: "};", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "Object", color: "#79c0ff" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "is", color: "#d2a8ff" },
+                  { text: "(oldState, newState); // 🎯 FALSE (Re-renders!)", color: "#7ee787" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Mutation vs Immutability",
+        badge: "Mutation vs Immutability",
+        badgeColor: VIOLET,
+        body: "Let's compare them. Direct mutation is fast to write, but keeps the same reference, causing silent bugs and rendering failures. Immutable updates create a new reference, ensuring predictable renders and compatibility with React DevTools.",
+      },
+      {
+        heading: "Wrong: Mutation Mistakes",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here is the key mistake: pushing directly to a state array or modifying an object key before calling set state. Instead, use the spread operator to create a shallow copy and update the value in a single step.",
+        code: {
+          filename: "DirectPush.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Wrong: Mutating items array directly", color: "#f43f5e", glow: true }],
+                [
+                  { text: "const [items, setItems] = useState([]);", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "const addItem = () => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  items.push('item'); // 🛑 Mutating state directly!", color: "#8b949e" }
+                ],
+                [
+                  { text: "  setItems(items);    // 🛑 React won't re-render", color: "#8b949e" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Correct: Mutation Mistakes",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here is the key mistake: pushing directly to a state array or modifying an object key before calling set state. Instead, use the spread operator to create a shallow copy and update the value in a single step.",
+        code: {
+          filename: "SpreadArray.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Correct: Copy array and update reference", color: "#7ee787", glow: true }],
+                [
+                  { text: "const [items, setItems] = useState([]);", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "const addItem = () => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  // 🎯 Creating new array reference via spread", color: "#8b949e" }
+                ],
+                [
+                  { text: "  setItems([...items, 'item']);", color: "#e1e4e8" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Simple Array updates?", answer: "Spread Operator", color: CYAN },
+      { question: "Shallow Object keys?", answer: "Spread Operator", color: CYAN },
+      { question: "Deeply Nested structures?", answer: "Immer Library", color: VIOLET },
+      { question: "State history tracking?", answer: "Immutability", color: EMERALD },
+    ],
+    keyTakeaways: [
+      "References — React tracks references, not content",
+      "New Address — Always return new object references",
+      "Spread (...) — Fastest way to create shallow copies",
+      "Nest States — Use Immer to simplify nested updates",
+    ],
+    relatedSlugs: [
+      "usestate-vs-useref",
+      "usememo-vs-usecallback",
+      "virtual-dom-vs-real-dom",
+    ],
+  },
+
+  {
+    slug: "synthetic-events-in-react-explained",
+    day: 16,
+    title: "Synthetic Events in React Explained",
+    shortTitle: "Synthetic Events",
+    badge: "Day 016",
+    accentColor: VIOLET,
+    difficulty: "Intermediate",
+    category: "Architecture",
+    description:
+      "Why does React wrap native browser events in a custom object called SyntheticEvent? Is it just for cross-browser compatibility, or is there something deeper happening? Let's dissect React's event system in under ninety seconds.",
+    sections: [
+      {
+        heading: "Event Normalization",
+        badge: "Event Normalization",
+        badgeColor: VIOLET,
+        body: "When you register an event handler like on click in React, the argument received is a SyntheticEvent wrapper. It normalizes event properties across different browsers, so you get identical behavior whether your users are on Chrome, Safari, or Firefox.",
+        code: {
+          filename: "SyntheticWrapper.ts",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🧠 SyntheticEvent Normalization", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "handleClick ", color: "#79c0ff" },
+                  { text: "= (e: React.MouseEvent) => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  // e is a SyntheticEvent wrapper", color: "#8b949e" }
+                ],
+                [
+                  { text: "  console", color: "#e1e4e8" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "log", color: "#d2a8ff", glow: true },
+                  { text: "(e.type); // 'click'", color: "#7ee787" }
+                ],
+                [
+                  { text: "  console", color: "#e1e4e8" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "log", color: "#d2a8ff" },
+                  { text: "(e.nativeEvent); // 🌐 Real event", color: "#7ee787" }
+                ],
+                [
+                  { text: "};", color: "#e1e4e8" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Event Delegation",
+        badge: "Event Delegation",
+        badgeColor: VIOLET,
+        body: "Behind the scenes, React doesn't attach event listeners to individual DOM elements. Instead, it uses event delegation. In React seventeen and above, a single listener for each event type is attached to your root application container, saving memory and improving performance.",
+        code: {
+          filename: "EventDelegation.ts",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🌐 React 17+ Event Delegation", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "// Bind listeners once at root level:", color: "#8b949e" }
+                ],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "root ", color: "#79c0ff" },
+                  { text: "= document.getElementById('root');", color: "#e1e4e8" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "root", color: "#e1e4e8" },
+                  { text: ".", color: "#ff7b72" },
+                  { text: "addEventListener", color: "#d2a8ff", glow: true },
+                  { text: "(", color: "#e1e4e8" },
+                  { text: "'click'", color: "#a5d6ff" },
+                  { text: ", handleEvent);", color: "#e1e4e8" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Native vs Synthetic",
+        badge: "Native vs Synthetic",
+        badgeColor: VIOLET,
+        body: "Let's compare them. Native browser events attach handlers directly to DOM elements and vary by browser. React Synthetic Events use a single delegator on the root element, wrap the native event with standard behavior, and handle memory optimization automatically.",
+      },
+      {
+        heading: "Wrong: Event Pooling",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here is a classic gotcha. In React sixteen and below, events were pooled and reused, meaning event properties were nullified in async code unless you called e dot persist. In React seventeen, event pooling is removed, making async event access safe and simple.",
+        code: {
+          filename: "React16Pooling.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ React 16 & Below: Event Pooling Bug", color: "#f43f5e", glow: true }],
+                [
+                  { text: "const handleClick = (e) => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  setTimeout(() => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    console.log(e.target); // 🛑 Nullified / Error!", color: "#8b949e" }
+                ],
+                [
+                  { text: "  }, 100);", color: "#e1e4e8" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Correct: Event Pooling",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here is a classic gotcha. In React sixteen and below, events were pooled and reused, meaning event properties were nullified in async code unless you called e dot persist. In React seventeen, event pooling is removed, making async event access safe and simple.",
+        code: {
+          filename: "React17NoPooling.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ React 17+: Safe Async Access (No Pooling)", color: "#7ee787", glow: true }],
+                [
+                  { text: "const handleClick = (e) => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  setTimeout(() => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    console.log(e.target); // 🎯 Works perfectly!", color: "#7ee787" }
+                ],
+                [
+                  { text: "  }, 100);", color: "#e1e4e8" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Need original browser event?", answer: "e.nativeEvent", color: CYAN },
+      { question: "Block parent event bubble?", answer: "e.stopPropagation()", color: CYAN },
+      { question: "Async access in React 16-?", answer: "Call e.persist()", color: VIOLET },
+      { question: "Async access in React 17+?", answer: "Safe by default", color: EMERALD },
+    ],
+    keyTakeaways: [
+      "Normalization — Unified cross-browser event wrapper",
+      "Delegation — Listeners bound to App Root container",
+      "No Pooling — Safe async access out of the box in v17+",
+      "Native API — Raw browser event inside e.nativeEvent",
+    ],
+    relatedSlugs: [
+      "react-fiber-why-react-got-faster",
+      "react-portals-what-theyre-for",
+      "controlled-vs-uncontrolled-components",
+    ],
+  },
+
+  {
+    slug: "react-portals-what-theyre-for",
+    day: 17,
+    title: "React Portals — What They're For",
+    shortTitle: "React Portals",
+    badge: "Day 017",
+    accentColor: VIOLET,
+    difficulty: "Beginner",
+    category: "Rendering",
+    description:
+      "Have you ever built a modal or a tooltip in React only to find it cropped by a parent's overflow hidden or messed up by z-index styling? React Portals are the ultimate solution to this common styling nightmare. Let's see how they work.",
+    sections: [
+      {
+        heading: "Traditional Subtree",
+        badge: "Traditional Subtree",
+        badgeColor: VIOLET,
+        body: "Normally, when you render a component in React, it mounts as a direct child of its closest parent element in the HTML DOM tree. While this is great for structure, it forces your floating elements like modals to inherit CSS limitations from parent containers.",
+        code: {
+          filename: "TraditionalSubtree.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// ❌ Traditional Rendering (Direct Subtree)", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "ParentComponent ", color: "#79c0ff" },
+                  { text: "= () => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return (", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    <div className=\"overflow-hidden\">", color: "#ff7b72" }
+                ],
+                [
+                  { text: "      {/* Modal is nested inside parent's DOM subtree */}", color: "#8b949e" }
+                ],
+                [
+                  { text: "      <Modal />", color: "#79c0ff", glow: true }
+                ],
+                [
+                  { text: "    </div>", color: "#ff7b72" }
+                ],
+                [
+                  { text: "  );", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "};", color: "#e1e4e8" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Portal Rendering",
+        badge: "Portal Rendering",
+        badgeColor: VIOLET,
+        body: "With React Portals, you can render a child component into a completely different part of the DOM tree, like directly under the document body. Under the hood, React retains full event bubbling and context API behaviors, even though the DOM node lives elsewhere.",
+        code: {
+          filename: "PortalModal.tsx",
+          accentColor: VIOLET,
+          lines: [
+                [{ text: "// 🌐 Portal Rendering (Escapes parent subtree)", color: "#8b949e" }],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "import ", color: "#ff7b72" },
+                  { text: "{ createPortal } ", color: "#e1e4e8" },
+                  { text: "from ", color: "#ff7b72" },
+                  { text: "'react-dom';", color: "#a5d6ff" }
+                ],
+                [{ text: "", color: "#e1e4e8" }],
+                [
+                  { text: "const ", color: "#ff7b72" },
+                  { text: "PortalModal ", color: "#79c0ff" },
+                  { text: "= () => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  return ", color: "#ff7b72" },
+                  { text: "createPortal", color: "#d2a8ff", glow: true },
+                  { text: "(", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "    <div className=\"modal\">Content</div>,", color: "#a5d6ff" }
+                ],
+                [
+                  { text: "    document.body // 🌐 Mounts under body", color: "#7ee787" }
+                ],
+                [
+                  { text: "  );", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "};", color: "#e1e4e8" }
+                ]
+              ]
+        },
+      },
+      {
+        heading: "Normal vs Portal",
+        badge: "Normal vs Portal",
+        badgeColor: VIOLET,
+        body: "Let's compare. Normal rendering nests the element deep inside the DOM, meaning parent styles like position relative, overflow hidden, or z-index constraints will clip or position your element incorrectly. Portal rendering mounts the element directly to a top-level node, completely bypassing parent layout rules.",
+      },
+      {
+        heading: "Wrong: Standard vs Portal",
+        badge: "Wrong",
+        badgeColor: ROSE,
+        body: "Here is how you write it. In a standard setup, you render a div which stays trapped inside the parent's container. By wrapping your content in create Portal and passing document dot body as the target, the modal renders at the top level of the page, completely free from parent containment.",
+        code: {
+          filename: "TrappedModal.tsx",
+          accentColor: ROSE,
+          lines: [
+                [{ text: "// ❌ Trapped Modal (clipping hazard)", color: "#f43f5e", glow: true }],
+                [
+                  { text: "const Modal = ({ children }) => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  // Render inside normal component subtree", color: "#8b949e" }
+                ],
+                [
+                  { text: "  return <div className=\"modal\">{children}</div>;", color: "#e1e4e8" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+      {
+        heading: "Correct: Standard vs Portal",
+        badge: "Correct",
+        badgeColor: EMERALD,
+        body: "Here is how you write it. In a standard setup, you render a div which stays trapped inside the parent's container. By wrapping your content in create Portal and passing document dot body as the target, the modal renders at the top level of the page, completely free from parent containment.",
+        code: {
+          filename: "PortalEscape.tsx",
+          accentColor: EMERALD,
+          lines: [
+                [{ text: "// ✅ Free Modal (escapes clipping)", color: "#7ee787", glow: true }],
+                [
+                  { text: "const Modal = ({ children }) => {", color: "#e1e4e8" }
+                ],
+                [
+                  { text: "  // Escape to document.body container node", color: "#8b949e" }
+                ],
+                [
+                  { text: "  return createPortal(children, document.body);", color: "#7ee787" }
+                ],
+                [{ text: "};", color: "#e1e4e8" }]
+              ]
+        },
+      },
+    ],
+    decisionRules: [
+      { question: "Escape parent overflow: hidden?", answer: "createPortal", color: CYAN },
+      { question: "Floating components (Modals/Tooltips)?", answer: "createPortal", color: CYAN },
+      { question: "Natural event bubbling needed?", answer: "React handles it", color: EMERALD },
+      { question: "Standard layout/page contents?", answer: "Normal Render", color: VIOLET },
+    ],
+    keyTakeaways: [
+      "DOM Escape — Render anywhere in the HTML hierarchy",
+      "React Bubbling — Retains full React event & context behavior",
+      "Style Safety — Bypasses overflow: hidden & z-index stacking",
+      "Best For — Perfect for Modals, Tooltips, & Popovers",
+    ],
+    relatedSlugs: [
+      "virtual-dom-vs-real-dom",
+      "synthetic-events-in-react-explained",
+      "error-boundaries-catch-crashes-gracefully",
+    ],
+  },
 ];
 
 // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
